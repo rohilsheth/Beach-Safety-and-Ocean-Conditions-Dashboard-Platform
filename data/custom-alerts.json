@@ -1,0 +1,14 @@
+[
+  {
+    "id": "alert-1771280784293-dywkj3wfe",
+    "beachId": "pacifica-linda-mar",
+    "title": "test",
+    "message": "test",
+    "priority": "medium",
+    "createdBy": "County Staff",
+    "createdAt": "2026-02-16T22:26:24.293Z",
+    "expiresAt": "2026-02-17T22:26:24.256Z",
+    "isActive": false,
+    "language": "both"
+  }
+]

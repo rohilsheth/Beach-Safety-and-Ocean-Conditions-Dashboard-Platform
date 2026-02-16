@@ -1,0 +1,68 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useLanguage } from '@/lib/LanguageContext';
+import LanguageToggle from './LanguageToggle';
+
+export default function Header() {
+  const { t } = useLanguage();
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: '/', label: t('nav.dashboard') },
+    { href: '/admin', label: t('nav.admin') },
+    { href: '/admin/alerts', label: 'Post Alerts' },
+    { href: '/analytics', label: t('nav.analytics') },
+  ];
+
+  return (
+    <header className="bg-primary text-white shadow-lg flex-shrink-0">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            {/* County Seal Placeholder */}
+            <div
+              className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-2xl"
+              aria-hidden="true"
+            >
+              🏛️
+            </div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold leading-tight">
+                {t('header.title')}
+              </h1>
+            </div>
+          </div>
+          <LanguageToggle />
+        </div>
+
+        {/* Navigation */}
+        <nav
+          className="flex gap-1 border-t border-white/20 pt-3"
+          role="navigation"
+          aria-label="Main navigation"
+        >
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  isActive
+                    ? 'bg-white text-primary'
+                    : 'text-white/90 hover:bg-white/10'
+                }`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </header>
+  );
+}
