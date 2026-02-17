@@ -5,10 +5,32 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/lib/LanguageContext';
 import LanguageToggle from './LanguageToggle';
+import { Clock } from 'lucide-react';
 
 export default function Header() {
   const { t } = useLanguage();
   const pathname = usePathname();
+  const [liveStatus, setLiveStatus] = React.useState<{
+    isLiveData: boolean;
+    lastUpdated: string;
+  } | null>(null);
+
+  React.useEffect(() => {
+    const handleLiveStatus = (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        isLiveData: boolean;
+        lastUpdated: string;
+      }>;
+      if (customEvent.detail) {
+        setLiveStatus(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('beach-live-status', handleLiveStatus as EventListener);
+    return () => {
+      window.removeEventListener('beach-live-status', handleLiveStatus as EventListener);
+    };
+  }, []);
 
   const navItems = [
     { href: '/', label: t('nav.dashboard') },
@@ -45,29 +67,52 @@ export default function Header() {
         </div>
 
         {/* Navigation */}
-        <nav
-          className="flex gap-1 border-t border-white/20 pt-3"
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                  isActive
-                    ? 'bg-white text-primary'
-                    : 'text-white/90 hover:bg-white/10'
-                }`}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex items-center justify-between border-t border-white/20 pt-3 gap-2">
+          <nav
+            className="flex gap-1"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                    isActive
+                      ? 'bg-white text-primary'
+                      : 'text-white/90 hover:bg-white/10'
+                  }`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {pathname === '/' && liveStatus && (
+            <div className={`shadow rounded-md px-2.5 py-1.5 flex items-center gap-2 border text-xs ${
+              liveStatus.isLiveData
+                ? 'bg-white/95 border-gray-200 text-gray-700'
+                : 'bg-white/90 border-gray-300 text-gray-600'
+            }`}>
+              <div className={`w-2 h-2 rounded-full ${liveStatus.isLiveData ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
+              <span className="font-medium">{liveStatus.isLiveData ? 'Live' : 'Loading...'}</span>
+              {liveStatus.isLiveData && (
+                <>
+                  <Clock className="w-3 h-3 text-gray-500" />
+                  <span>{new Date(liveStatus.lastUpdated).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 
 export default function AdminLogin() {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function AdminLogin() {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
@@ -27,7 +28,7 @@ export default function AdminLogin() {
         router.refresh();
       } else {
         const result = await response.json().catch(() => null);
-        setError(result?.error || 'Invalid password. Please try again.');
+        setError(result?.error || 'Invalid username or password. Please try again.');
         setPassword('');
       }
     } catch (err) {
@@ -60,6 +61,23 @@ export default function AdminLogin() {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Admin Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all text-lg"
+              placeholder="Enter your username"
+              required
+              autoFocus
+              autoCapitalize="none"
+              autoCorrect="off"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
               Admin Password
             </label>
             <input
@@ -69,7 +87,6 @@ export default function AdminLogin() {
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all text-lg"
               placeholder="Enter your password"
               required
-              autoFocus
             />
           </div>
 

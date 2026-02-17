@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -73,6 +73,17 @@ function MapInteractionTracker() {
 export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const lastSelectionRef = useRef<{ id: string; at: number } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const updateIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+    return () => window.removeEventListener('resize', updateIsMobile);
+  }, []);
 
   const selectBeachFromMap = (beach: Beach, source: 'marker' | 'popup') => {
     const now = Date.now();
@@ -100,12 +111,13 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
   // Create custom marker icons based on flag status
   const createMarkerIcon = (flagStatus: string) => {
     const color = FLAG_COLORS[flagStatus as keyof typeof FLAG_COLORS];
+    const size = isMobile ? 36 : 32;
     return L.divIcon({
       className: 'custom-marker',
       html: `
         <div style="
-          width: 32px;
-          height: 32px;
+          width: ${size}px;
+          height: ${size}px;
           background-color: ${color};
           border: 3px solid white;
           border-radius: 50%;
@@ -118,8 +130,8 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
           🏖️
         </div>
       `,
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
       popupAnchor: [0, -16],
     });
   };
@@ -151,43 +163,35 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
           icon={createMarkerIcon(beach.flagStatus)}
           eventHandlers={{
             click: () => selectBeachFromMap(beach, 'marker'),
+            mousedown: () => selectBeachFromMap(beach, 'marker'),
           }}
         >
-          <Popup>
-            <div className="p-2 min-w-[200px]">
-              <h3 className="font-bold text-sm mb-1">{beach.name}</h3>
-              {beach.nickname && (
-                <p className="text-xs text-gray-600 mb-2">({beach.nickname})</p>
-              )}
-              <div className="space-y-1 text-xs">
-                <p>🌊 Waves: {beach.conditions.waveHeight} ft</p>
-                <p>💨 Wind: {beach.conditions.windSpeed} mph</p>
-                <p>🌡️ Water: {beach.conditions.waterTemp}°F</p>
-              </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  selectBeachFromMap(beach, 'popup');
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  selectBeachFromMap(beach, 'popup');
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+          {!isMobile && (
+            <Popup>
+              <div className="p-2 min-w-[200px]">
+                <h3 className="font-bold text-sm mb-1">{beach.name}</h3>
+                {beach.nickname && (
+                  <p className="text-xs text-gray-600 mb-2">({beach.nickname})</p>
+                )}
+                <div className="space-y-1 text-xs">
+                  <p>🌊 Waves: {beach.conditions.waveHeight} ft</p>
+                  <p>💨 Wind: {beach.conditions.windSpeed} mph</p>
+                  <p>🌡️ Water: {beach.conditions.waterTemp}°F</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     selectBeachFromMap(beach, 'popup');
-                  }
-                }}
-                className="mt-3 w-full bg-primary text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-primary/90 transition-colors touch-manipulation"
-              >
-                View Details
-              </button>
-            </div>
-          </Popup>
+                  }}
+                  className="mt-3 w-full bg-primary text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-primary/90 transition-colors touch-manipulation"
+                >
+                  View Details
+                </button>
+              </div>
+            </Popup>
+          )}
         </Marker>
       ))}
     </MapContainer>

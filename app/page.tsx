@@ -6,7 +6,7 @@ import { Beach } from '@/lib/types';
 import { beaches as fallbackBeaches } from '@/data/beaches';
 import BeachList from '@/components/BeachList';
 import BeachDetail from '@/components/BeachDetail';
-import { Clock, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { trackPageView, trackBeachView } from '@/lib/analytics';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
@@ -137,14 +137,6 @@ export default function DashboardPage() {
     }
   }, [beaches]);
 
-  const formatTimestamp = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
   const handleSelectBeach = (beach: Beach | null) => {
     setSelectedBeach(beach);
     if (beach) {
@@ -153,31 +145,19 @@ export default function DashboardPage() {
     }
   };
 
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent('beach-live-status', {
+        detail: {
+          isLiveData,
+          lastUpdated: lastUpdated.toISOString(),
+        },
+      })
+    );
+  }, [isLiveData, lastUpdated]);
+
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden">
-      {/* Live Data Indicator - Desktop fixed */}
-      <div className="hidden md:block fixed top-20 right-4 z-50">
-        <div className={`shadow-lg rounded-md px-2 py-1.5 md:rounded-lg md:px-3 md:py-2 flex items-center gap-2 border transition-all backdrop-blur-md ${
-          isLiveData
-            ? 'bg-white/90 border-gray-200'
-            : 'bg-white/90 border-gray-300'
-        }`}>
-          <div className={`w-2 h-2 rounded-full ${isLiveData ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
-          <span className={`text-[11px] md:text-xs font-medium ${isLiveData ? 'text-gray-700' : 'text-gray-600'}`}>
-            {isLiveData ? 'Live' : 'Loading...'}
-          </span>
-          {isLiveData && (
-            <>
-              <div className="hidden md:block h-3 w-px bg-gray-300"></div>
-              <Clock className="w-3 h-3 text-gray-500" />
-              <span className="text-[11px] md:text-xs text-gray-600">
-                {formatTimestamp(lastUpdated)}
-              </span>
-            </>
-          )}
-        </div>
-      </div>
-
       {/* Error Banner */}
       {error && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-yellow-50 border-2 border-yellow-400 rounded-lg px-4 py-2 flex items-center gap-2 text-sm max-w-md">
@@ -190,27 +170,7 @@ export default function DashboardPage() {
 
       {/* Mobile View Toggle */}
       <div className="md:hidden bg-white border-b border-gray-200">
-        <div className="px-4 pt-3 flex justify-end">
-          <div className={`shadow rounded-md px-2.5 py-1.5 flex items-center gap-2 border transition-all ${
-            isLiveData
-              ? 'bg-white border-gray-200'
-              : 'bg-white border-gray-300'
-          }`}>
-            <div className={`w-2 h-2 rounded-full ${isLiveData ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
-            <span className={`text-xs font-medium ${isLiveData ? 'text-gray-700' : 'text-gray-600'}`}>
-              {isLiveData ? 'Live' : 'Loading...'}
-            </span>
-            {isLiveData && (
-              <>
-                <Clock className="w-3 h-3 text-gray-500" />
-                <span className="text-xs text-gray-600">
-                  {formatTimestamp(lastUpdated)}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="flex gap-2 p-4 pt-2">
+        <div className="flex gap-2 p-4">
           <button
             onClick={() => setShowMobileView('list')}
             className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors ${

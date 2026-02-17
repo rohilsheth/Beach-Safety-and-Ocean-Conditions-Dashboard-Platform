@@ -7,7 +7,8 @@ import {
 
 export async function POST(request: Request) {
   try {
-    const { password } = await request.json();
+    const { username, password } = await request.json();
+    const configuredUsername = process.env.ADMIN_USERNAME || 'admin';
     const configuredPassword = process.env.ADMIN_PASSWORD;
 
     if (!configuredPassword) {
@@ -17,8 +18,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check password against environment variable
-    if (typeof password === 'string' && password === configuredPassword) {
+    const isValidUsername =
+      typeof username === 'string' && username === configuredUsername;
+    const isValidPassword =
+      typeof password === 'string' && password === configuredPassword;
+
+    if (isValidUsername && isValidPassword) {
       // Set secure HTTP-only cookie
       cookies().set(ADMIN_AUTH_COOKIE, ADMIN_AUTH_VALUE, {
         httpOnly: true,
@@ -32,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, error: 'Invalid password' },
+      { success: false, error: 'Invalid username or password' },
       { status: 401 }
     );
   } catch (error) {
