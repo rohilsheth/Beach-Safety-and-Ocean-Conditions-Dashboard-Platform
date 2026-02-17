@@ -72,6 +72,30 @@ function MapInteractionTracker() {
 
 export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
+  const lastSelectionRef = useRef<{ id: string; at: number } | null>(null);
+
+  const selectBeachFromMap = (beach: Beach, source: 'marker' | 'popup') => {
+    const now = Date.now();
+    const last = lastSelectionRef.current;
+
+    // Prevent duplicate rapid-fire events (touch + click on iOS)
+    if (last && last.id === beach.id && now - last.at < 350) {
+      return;
+    }
+    lastSelectionRef.current = { id: beach.id, at: now };
+
+    try {
+      if (source === 'marker') {
+        trackMapInteraction('marker_click', beach.id);
+      } else {
+        trackMapInteraction('popup_view_details', beach.id);
+      }
+      onSelectBeach(beach);
+      mapRef.current?.closePopup();
+    } catch (error) {
+      console.error('Map beach selection error:', error);
+    }
+  };
 
   // Create custom marker icons based on flag status
   const createMarkerIcon = (flagStatus: string) => {
@@ -126,10 +150,7 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
           position={[beach.coordinates.lat, beach.coordinates.lng]}
           icon={createMarkerIcon(beach.flagStatus)}
           eventHandlers={{
-            click: () => {
-              trackMapInteraction('marker_click', beach.id);
-              onSelectBeach(beach);
-            },
+            click: () => selectBeachFromMap(beach, 'marker'),
           }}
         >
           <Popup>
@@ -144,8 +165,24 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
                 <p>🌡️ Water: {beach.conditions.waterTemp}°F</p>
               </div>
               <button
-                onClick={() => onSelectBeach(beach)}
-                className="mt-3 w-full bg-primary text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-primary/90 transition-colors"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  selectBeachFromMap(beach, 'popup');
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  selectBeachFromMap(beach, 'popup');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectBeachFromMap(beach, 'popup');
+                  }
+                }}
+                className="mt-3 w-full bg-primary text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-primary/90 transition-colors touch-manipulation"
               >
                 View Details
               </button>

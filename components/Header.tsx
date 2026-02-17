@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <header className="bg-primary text-white shadow-lg flex-shrink-0">
       <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-start justify-between mb-2 gap-3">
           <div className="flex items-center gap-3">
             {/* County Seal Placeholder */}
             <div
@@ -32,11 +32,11 @@ export default function Header() {
               </h1>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">
             <LanguageToggle />
             <Link
               href="/admin"
-              className="text-white/70 hover:text-white text-xs font-medium transition-colors flex items-center gap-1"
+              className="text-white/70 hover:text-white text-[11px] sm:text-xs font-medium transition-colors flex items-center gap-1 leading-none"
               title="Admin Login"
             >
               🔐 Admin

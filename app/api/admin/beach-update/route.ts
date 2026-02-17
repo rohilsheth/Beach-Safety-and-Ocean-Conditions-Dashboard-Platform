@@ -4,6 +4,7 @@ import {
   isAdminAuthenticated,
   unauthorizedAdminResponse,
 } from '@/lib/server/adminAuth';
+import { invalidateBeachDataCache } from '@/lib/api/aggregator';
 import fs from 'fs';
 import path from 'path';
 
@@ -94,6 +95,7 @@ export async function POST(request: Request) {
     }
 
     writeAdminUpdates(updates);
+    invalidateBeachDataCache();
 
     return NextResponse.json({
       success: true,
@@ -132,6 +134,7 @@ export async function DELETE(request: Request) {
     const filteredUpdates = updates.filter((update) => update.beachId !== beachId);
 
     writeAdminUpdates(filteredUpdates);
+    invalidateBeachDataCache();
 
     return NextResponse.json({
       success: true,

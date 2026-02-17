@@ -212,6 +212,11 @@ let lastFetchTime: number = 0;
 let cachedData: Beach[] | null = null;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+export function invalidateBeachDataCache() {
+  cachedData = null;
+  lastFetchTime = 0;
+}
+
 export async function getCachedBeachData(): Promise<Beach[]> {
   const now = Date.now();
 

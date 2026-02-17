@@ -5,23 +5,26 @@ import { Beach, FlagStatus, Region } from '@/lib/types';
 import { useLanguage } from '@/lib/LanguageContext';
 import FlagBadge from './FlagBadge';
 import HazardChip from './HazardChip';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 interface BeachListProps {
   beaches: Beach[];
   selectedBeach: Beach | null;
   onSelectBeach: (beach: Beach) => void;
+  mobileFiltersCollapsed?: boolean;
 }
 
 export default function BeachList({
   beaches,
   selectedBeach,
   onSelectBeach,
+  mobileFiltersCollapsed = false,
 }: BeachListProps) {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState<Region | 'all'>('all');
   const [flagFilter, setFlagFilter] = useState<FlagStatus | 'all'>('all');
+  const [filtersOpen, setFiltersOpen] = useState(!mobileFiltersCollapsed);
 
   const filteredBeaches = useMemo(() => {
     return beaches.filter((beach) => {
@@ -45,6 +48,26 @@ export default function BeachList({
     <div className="h-full flex flex-col bg-white border-r border-gray-200">
       {/* Filters */}
       <div className="p-4 border-b border-gray-200 space-y-3">
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((prev) => !prev)}
+          className="md:hidden w-full flex items-center justify-between px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-700"
+          aria-expanded={filtersOpen}
+          aria-controls="beach-filters-panel"
+        >
+          <span className="inline-flex items-center gap-2 text-sm font-medium">
+            <SlidersHorizontal className="w-4 h-4" />
+            Search & Filters
+          </span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+
+        <div
+          id="beach-filters-panel"
+          className={`${filtersOpen ? 'block' : 'hidden'} md:block space-y-3`}
+        >
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -92,6 +115,7 @@ export default function BeachList({
             <option value="yellow">{t('flag.yellow')}</option>
             <option value="red">{t('flag.red')}</option>
           </select>
+        </div>
         </div>
       </div>
 

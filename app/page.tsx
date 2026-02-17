@@ -58,6 +58,7 @@ export default function DashboardPage() {
 
       const response = await fetch('/api/beaches', {
         signal: controller.signal,
+        cache: 'no-store',
       });
       clearTimeout(timeoutId);
 
@@ -105,6 +106,27 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Refresh when returning to dashboard tab/window (helps admin updates show quickly)
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchBeachData();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchBeachData();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   // Update selected beach when beaches data changes
   useEffect(() => {
     if (selectedBeach) {
@@ -133,8 +155,8 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden">
-      {/* Live Data Indicator - Always Visible & Fixed */}
-      <div className="fixed top-[118px] right-3 z-50 md:top-20 md:right-4">
+      {/* Live Data Indicator - Desktop fixed */}
+      <div className="hidden md:block fixed top-20 right-4 z-50">
         <div className={`shadow-lg rounded-md px-2 py-1.5 md:rounded-lg md:px-3 md:py-2 flex items-center gap-2 border transition-all backdrop-blur-md ${
           isLiveData
             ? 'bg-white/90 border-gray-200'
@@ -167,27 +189,49 @@ export default function DashboardPage() {
       )}
 
       {/* Mobile View Toggle */}
-      <div className="md:hidden flex gap-2 p-4 bg-white border-b border-gray-200">
-        <button
-          onClick={() => setShowMobileView('list')}
-          className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors ${
-            showMobileView === 'list'
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-700'
-          }`}
-        >
-          Beach List
-        </button>
-        <button
-          onClick={() => setShowMobileView('map')}
-          className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors ${
-            showMobileView === 'map'
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-700'
-          }`}
-        >
-          Map View
-        </button>
+      <div className="md:hidden bg-white border-b border-gray-200">
+        <div className="px-4 pt-3 flex justify-end">
+          <div className={`shadow rounded-md px-2.5 py-1.5 flex items-center gap-2 border transition-all ${
+            isLiveData
+              ? 'bg-white border-gray-200'
+              : 'bg-white border-gray-300'
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${isLiveData ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
+            <span className={`text-xs font-medium ${isLiveData ? 'text-gray-700' : 'text-gray-600'}`}>
+              {isLiveData ? 'Live' : 'Loading...'}
+            </span>
+            {isLiveData && (
+              <>
+                <Clock className="w-3 h-3 text-gray-500" />
+                <span className="text-xs text-gray-600">
+                  {formatTimestamp(lastUpdated)}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="flex gap-2 p-4 pt-2">
+          <button
+            onClick={() => setShowMobileView('list')}
+            className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors ${
+              showMobileView === 'list'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            Beach List
+          </button>
+          <button
+            onClick={() => setShowMobileView('map')}
+            className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors ${
+              showMobileView === 'map'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            Map View
+          </button>
+        </div>
       </div>
 
       {/* Desktop Layout */}
@@ -227,32 +271,23 @@ export default function DashboardPage() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden flex-1 overflow-hidden">
+      <div className="md:hidden flex-1 overflow-hidden relative">
         {showMobileView === 'list' ? (
           <div className="h-full flex flex-col">
             <div className="flex-1 overflow-hidden">
               <BeachList
                 beaches={beaches}
                 selectedBeach={selectedBeach}
+                mobileFiltersCollapsed
                 onSelectBeach={(beach) => {
                   handleSelectBeach(beach);
                 }}
               />
             </div>
-            {selectedBeach && (
-              <div className="border-t border-gray-200 bg-white p-3">
-                <button
-                  onClick={() => setShowMobileView('map')}
-                  className="w-full rounded-lg bg-primary text-white py-3 text-sm font-semibold"
-                >
-                  View {selectedBeach.name} on map
-                </button>
-              </div>
-            )}
           </div>
         ) : (
-          <div className="h-full flex flex-col">
-            <div className="flex-1 relative">
+          <div className="h-full">
+            <div className="h-full relative">
               <ErrorBoundary
                 fallback={
                   <div className="h-full flex items-center justify-center bg-gray-100 p-6 text-center">
@@ -277,14 +312,15 @@ export default function DashboardPage() {
                 />
               </ErrorBoundary>
             </div>
-            {selectedBeach && (
-              <div className="h-1/2 overflow-hidden border-t-4 border-primary">
-                <BeachDetail
-                  beach={selectedBeach}
-                  onClose={() => handleSelectBeach(null)}
-                />
-              </div>
-            )}
+          </div>
+        )}
+
+        {selectedBeach && (
+          <div className="absolute inset-0 z-50 bg-white overflow-hidden">
+            <BeachDetail
+              beach={selectedBeach}
+              onClose={() => handleSelectBeach(null)}
+            />
           </div>
         )}
       </div>

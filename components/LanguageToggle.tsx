@@ -17,13 +17,13 @@ export default function LanguageToggle() {
 
   return (
     <div
-      className="inline-flex rounded-lg border-2 border-gray-300 bg-white overflow-hidden"
+      className="inline-flex rounded-md border-2 border-gray-300 bg-white overflow-hidden"
       role="group"
       aria-label="Language selection"
     >
       <button
         onClick={() => handleToggle('en')}
-        className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+        className={`px-2.5 py-1 text-xs sm:text-sm font-medium transition-colors ${
           language === 'en'
             ? 'bg-primary text-white'
             : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -35,7 +35,7 @@ export default function LanguageToggle() {
       </button>
       <button
         onClick={() => handleToggle('es')}
-        className={`px-3 py-1.5 text-sm font-medium transition-colors border-l-2 border-gray-300 ${
+        className={`px-2.5 py-1 text-xs sm:text-sm font-medium transition-colors border-l-2 border-gray-300 ${
           language === 'es'
             ? 'bg-primary text-white'
             : 'bg-white text-gray-700 hover:bg-gray-100'
