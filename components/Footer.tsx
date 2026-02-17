@@ -13,16 +13,13 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs">
           <div className="text-center md:text-left">
             <p>
-              {t('footer.poweredBy')}{' '}
-              <span className="font-semibold">BeachSafe Solutions</span>
-              {' • '}
               <span className="text-gray-400">{t('footer.copyright')}</span>
             </p>
           </div>
 
           <div className="text-center md:text-right text-gray-400">
             <p>
-              {DATA_SOURCES.noaa} • {DATA_SOURCES.nws} • {DATA_SOURCES.epa}
+              {t('footer.dataSources')}: {DATA_SOURCES.noaa} • {DATA_SOURCES.nws} • {DATA_SOURCES.epa}
             </p>
           </div>
         </div>

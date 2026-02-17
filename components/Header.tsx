@@ -12,9 +12,6 @@ export default function Header() {
 
   const navItems = [
     { href: '/', label: t('nav.dashboard') },
-    { href: '/admin', label: t('nav.admin') },
-    { href: '/admin/alerts', label: 'Post Alerts' },
-    { href: '/analytics', label: t('nav.analytics') },
   ];
 
   return (
@@ -35,7 +32,16 @@ export default function Header() {
               </h1>
             </div>
           </div>
-          <LanguageToggle />
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <Link
+              href="/admin"
+              className="text-white/70 hover:text-white text-xs font-medium transition-colors flex items-center gap-1"
+              title="Admin Login"
+            >
+              🔐 Admin
+            </Link>
+          </div>
         </div>
 
         {/* Navigation */}

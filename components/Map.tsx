@@ -1,10 +1,18 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from 'react-leaflet';
 import L from 'leaflet';
 import { Beach } from '@/lib/types';
 import { FLAG_COLORS } from '@/lib/constants';
+import { trackMapInteraction } from '@/lib/analytics';
 import 'leaflet/dist/leaflet.css';
 
 interface MapProps {
@@ -18,12 +26,46 @@ function MapController({ selectedBeach }: { selectedBeach: Beach | null }) {
   const map = useMap();
 
   useEffect(() => {
-    if (selectedBeach) {
-      map.flyTo([selectedBeach.coordinates.lat, selectedBeach.coordinates.lng], 12, {
+    if (!selectedBeach) {
+      return;
+    }
+
+    const { lat, lng } = selectedBeach.coordinates;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
+    }
+
+    try {
+      map.flyTo([lat, lng], 12, {
         duration: 1.5,
       });
+    } catch (error) {
+      console.error('Map flyTo error:', error);
     }
   }, [selectedBeach, map]);
+
+  return null;
+}
+
+function MapInteractionTracker() {
+  const lastTrackedAt = useRef(0);
+
+  useMapEvents({
+    moveend: () => {
+      const now = Date.now();
+      if (now - lastTrackedAt.current > 15000) {
+        trackMapInteraction('move');
+        lastTrackedAt.current = now;
+      }
+    },
+    zoomend: () => {
+      const now = Date.now();
+      if (now - lastTrackedAt.current > 15000) {
+        trackMapInteraction('zoom');
+        lastTrackedAt.current = now;
+      }
+    },
+  });
 
   return null;
 }
@@ -76,6 +118,7 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
       />
 
       <MapController selectedBeach={selectedBeach} />
+      <MapInteractionTracker />
 
       {beaches.map((beach) => (
         <Marker
@@ -83,7 +126,10 @@ export default function Map({ beaches, selectedBeach, onSelectBeach }: MapProps)
           position={[beach.coordinates.lat, beach.coordinates.lng]}
           icon={createMarkerIcon(beach.flagStatus)}
           eventHandlers={{
-            click: () => onSelectBeach(beach),
+            click: () => {
+              trackMapInteraction('marker_click', beach.id);
+              onSelectBeach(beach);
+            },
           }}
         >
           <Popup>

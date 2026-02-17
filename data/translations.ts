@@ -91,7 +91,7 @@ export const translations: Translations = {
 
   // Footer
   'footer.poweredBy': { en: 'Powered by', es: 'Desarrollado por' },
-  'footer.dataSources': { en: 'Data sources', es: 'Fuentes de datos' },
+  'footer.dataSources': { en: 'Data Sources', es: 'Fuentes de Datos' },
   'footer.copyright': { en: '© 2026 County of San Mateo', es: '© 2026 Condado de San Mateo' },
 
   // Header

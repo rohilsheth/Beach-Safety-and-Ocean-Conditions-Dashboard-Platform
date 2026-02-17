@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { AdminUpdate, FlagStatus, HazardType } from '@/lib/types';
+import {
+  isAdminAuthenticated,
+  unauthorizedAdminResponse,
+} from '@/lib/server/adminAuth';
 import fs from 'fs';
 import path from 'path';
 
@@ -40,6 +44,10 @@ function writeAdminUpdates(updates: AdminUpdate[]) {
 
 // GET - Retrieve all admin updates
 export async function GET() {
+  if (!isAdminAuthenticated()) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const updates = readAdminUpdates();
     return NextResponse.json({
@@ -58,6 +66,10 @@ export async function GET() {
 
 // POST - Save admin beach update
 export async function POST(request: Request) {
+  if (!isAdminAuthenticated()) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const body = await request.json();
     const updates = readAdminUpdates();
@@ -99,6 +111,10 @@ export async function POST(request: Request) {
 
 // DELETE - Remove admin override for a specific beach (reset to automatic)
 export async function DELETE(request: Request) {
+  if (!isAdminAuthenticated()) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const beachId = searchParams.get('beachId');

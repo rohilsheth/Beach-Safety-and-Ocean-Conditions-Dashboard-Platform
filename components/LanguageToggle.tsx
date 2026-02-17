@@ -3,11 +3,15 @@
 import React from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { Language } from '@/lib/types';
+import { trackLanguageChange } from '@/lib/analytics';
 
 export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
 
   const handleToggle = (lang: Language) => {
+    if (lang !== language) {
+      trackLanguageChange(language, lang);
+    }
     setLanguage(lang);
   };
 

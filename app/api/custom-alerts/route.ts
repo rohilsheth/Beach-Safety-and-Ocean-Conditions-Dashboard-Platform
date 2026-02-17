@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { CustomAlert } from '@/lib/types';
+import {
+  isAdminAuthenticated,
+  unauthorizedAdminResponse,
+} from '@/lib/server/adminAuth';
 import fs from 'fs';
 import path from 'path';
 
@@ -65,6 +69,10 @@ export async function GET() {
 
 // POST - Create a new custom alert
 export async function POST(request: Request) {
+  if (!isAdminAuthenticated()) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const body = await request.json();
     const alerts = readAlerts();
@@ -101,6 +109,10 @@ export async function POST(request: Request) {
 
 // DELETE - Deactivate or delete an alert
 export async function DELETE(request: Request) {
+  if (!isAdminAuthenticated()) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const alertId = searchParams.get('id');

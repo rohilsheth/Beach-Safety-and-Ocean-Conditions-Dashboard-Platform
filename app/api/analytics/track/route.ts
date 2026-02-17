@@ -4,6 +4,14 @@ import fs from 'fs';
 import path from 'path';
 
 const ANALYTICS_FILE = path.join(process.cwd(), 'data', 'analytics-events.json');
+const ALLOWED_EVENT_TYPES: AnalyticsEventType[] = [
+  'page_view',
+  'beach_view',
+  'alert_click',
+  'flag_view',
+  'map_interaction',
+  'language_change',
+];
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -44,11 +52,20 @@ function writeAnalyticsEvents(events: AnalyticsEvent[]) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const eventType = body.type as AnalyticsEventType;
+
+    if (!ALLOWED_EVENT_TYPES.includes(eventType)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid analytics event type' },
+        { status: 400 }
+      );
+    }
+
     const events = readAnalyticsEvents();
 
     const newEvent: AnalyticsEvent = {
       id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      type: body.type as AnalyticsEventType,
+      type: eventType,
       timestamp: body.timestamp || new Date().toISOString(),
       data: body.data || {},
     };

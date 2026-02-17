@@ -694,5 +694,228 @@
       "beachId": "pacifica-linda-mar",
       "beachName": "Pacifica State Beach"
     }
+  },
+  {
+    "id": "event-1771285326829-we9tkywkv",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:42:05.766Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771285326832-z10hsw6ym",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:42:05.776Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771285327893-29hsj8ljq",
+    "type": "beach_view",
+    "timestamp": "2026-02-16T23:42:07.864Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771285328921-t2maswwl4",
+    "type": "beach_view",
+    "timestamp": "2026-02-16T23:42:07.916Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771285329130-k51qfuv5m",
+    "type": "beach_view",
+    "timestamp": "2026-02-16T23:42:09.071Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771285329174-scnwftxhi",
+    "type": "beach_view",
+    "timestamp": "2026-02-16T23:42:09.129Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771285394389-uilvxtgca",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:43:13.946Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771285394392-7i3spof5h",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:43:13.937Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771285951291-y9mcu0aen",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:52:30.312Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771285951294-8kgsoc2rc",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:52:30.308Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771285954985-ekyhoeum2",
+    "type": "beach_view",
+    "timestamp": "2026-02-16T23:52:34.962Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771286209652-mw4y75dpo",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:56:48.652Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771286209654-oxjgl97kh",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:56:48.661Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771286211164-nbwugsc0x",
+    "type": "beach_view",
+    "timestamp": "2026-02-16T23:56:51.143Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771286224389-ypienyuo2",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:57:04.307Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771286224471-um7ldpbtc",
+    "type": "page_view",
+    "timestamp": "2026-02-16T23:57:04.310Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771286781289-fviu5fbj0",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:06:20.174Z",
+    "data": {
+      "path": "/admin/analytics"
+    }
+  },
+  {
+    "id": "event-1771286781291-5zpgs73bu",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:06:20.179Z",
+    "data": {
+      "path": "/admin/analytics"
+    }
+  },
+  {
+    "id": "event-1771288596188-gz939s2u3",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:36:34.726Z",
+    "data": {
+      "path": "/admin/analytics"
+    }
+  },
+  {
+    "id": "event-1771288596190-ia5a65570",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:36:34.717Z",
+    "data": {
+      "path": "/admin/analytics"
+    }
+  },
+  {
+    "id": "event-1771288610818-5yxouaif4",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:36:50.292Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771288610844-mcbt529g5",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:36:50.296Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771288670882-smdzeijvy",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:37:50.784Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771288670947-r3iqz67kb",
+    "type": "page_view",
+    "timestamp": "2026-02-17T00:37:50.788Z",
+    "data": {
+      "path": "/"
+    }
+  },
+  {
+    "id": "event-1771288673093-35v3v06dv",
+    "type": "beach_view",
+    "timestamp": "2026-02-17T00:37:53.064Z",
+    "data": {
+      "beachId": "pacifica-linda-mar",
+      "beachName": "Pacifica State Beach"
+    }
+  },
+  {
+    "id": "event-1771288674629-ucwjxhfti",
+    "type": "map_interaction",
+    "timestamp": "2026-02-17T00:37:54.613Z",
+    "data": {
+      "action": "zoom"
+    }
+  },
+  {
+    "id": "event-1771288734023-vkk1d2d41",
+    "type": "map_interaction",
+    "timestamp": "2026-02-17T00:38:53.964Z",
+    "data": {
+      "action": "move"
+    }
   }
 ]

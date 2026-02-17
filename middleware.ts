@@ -1,37 +1,48 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import {
+  ADMIN_AUTH_COOKIE,
+  ADMIN_AUTH_VALUE,
+} from '@/lib/server/adminAuth';
 
 /**
  * Middleware for Admin Authentication
- * Protects /admin routes with HTTP Basic Authentication
+ * Protects /admin routes with cookie-based authentication
  *
- * Credentials are set via environment variable:
- * ADMIN_PASSWORD=your_secure_password
+ * Login page: /admin/login
+ * Credentials set via environment variable: ADMIN_PASSWORD
  */
 export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const authCookie = request.cookies.get(ADMIN_AUTH_COOKIE);
+  const isAuthenticated = authCookie?.value === ADMIN_AUTH_VALUE;
+
   // Only protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    const basicAuth = request.headers.get('authorization');
-
-    if (basicAuth) {
-      const authValue = basicAuth.split(' ')[1];
-      const [user, pwd] = atob(authValue).split(':');
-
-      // Check credentials
-      // Username: admin
-      // Password: from environment variable
-      if (user === 'admin' && pwd === process.env.ADMIN_PASSWORD) {
-        return NextResponse.next();
-      }
+  if (pathname.startsWith('/admin')) {
+    // Allow access to login page
+    if (pathname === '/admin/login') {
+      return NextResponse.next();
     }
 
-    // Authentication failed or not provided
-    return new NextResponse('Authentication required', {
-      status: 401,
-      headers: {
-        'WWW-Authenticate': 'Basic realm="San Mateo County Beach Safety Admin"',
-      },
-    });
+    if (isAuthenticated) {
+      return NextResponse.next();
+    }
+
+    // Not authenticated - redirect to login
+    const loginUrl = new URL('/admin/login', request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  const isProtectedApiRoute =
+    pathname.startsWith('/api/admin/') ||
+    pathname === '/api/analytics/stats' ||
+    (pathname === '/api/custom-alerts' && request.method !== 'GET');
+
+  if (isProtectedApiRoute && !isAuthenticated) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
   }
 
   // Allow all other routes
@@ -40,5 +51,10 @@ export function middleware(request: NextRequest) {
 
 // Configure which routes to protect
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: [
+    '/admin/:path*',
+    '/api/admin/:path*',
+    '/api/custom-alerts',
+    '/api/analytics/stats',
+  ],
 };

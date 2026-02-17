@@ -8,6 +8,7 @@ import BeachList from '@/components/BeachList';
 import BeachDetail from '@/components/BeachDetail';
 import { Clock, AlertCircle } from 'lucide-react';
 import { trackPageView, trackBeachView } from '@/lib/analytics';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Dynamically import Map component with no SSR
 const Map = dynamic(() => import('@/components/Map'), {
@@ -27,7 +28,7 @@ export default function DashboardPage() {
   const [selectedBeach, setSelectedBeach] = useState<Beach | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [showMobileView, setShowMobileView] = useState<'list' | 'map'>('list');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLiveData, setIsLiveData] = useState(false);
 
@@ -50,7 +51,15 @@ export default function DashboardPage() {
   const fetchBeachData = async () => {
     try {
       setError(null);
-      const response = await fetch('/api/beaches');
+
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+      const response = await fetch('/api/beaches', {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -68,7 +77,11 @@ export default function DashboardPage() {
       }
     } catch (err) {
       console.error('Error fetching beach data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load live data');
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Request timeout - using fallback data');
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to load live data');
+      }
       setIsLiveData(false);
       // Keep using fallback data
     } finally {
@@ -97,10 +110,10 @@ export default function DashboardPage() {
     if (selectedBeach) {
       const updatedBeach = beaches.find((b) => b.id === selectedBeach.id);
       if (updatedBeach) {
-        handleSelectBeach(updatedBeach);
+        setSelectedBeach(updatedBeach);
       }
     }
-  }, [beaches, selectedBeach]);
+  }, [beaches]);
 
   const formatTimestamp = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -120,34 +133,27 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden">
-      {/* Live Data Indicator - Always Visible */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-        <div className={`shadow-xl rounded-lg px-4 py-2 flex items-center gap-3 text-sm border-2 transition-all ${
+      {/* Live Data Indicator - Always Visible & Fixed */}
+      <div className="fixed top-[118px] right-3 z-50 md:top-20 md:right-4">
+        <div className={`shadow-lg rounded-md px-2 py-1.5 md:rounded-lg md:px-3 md:py-2 flex items-center gap-2 border transition-all backdrop-blur-md ${
           isLiveData
-            ? 'bg-green-50 border-green-500'
-            : 'bg-yellow-50 border-yellow-500'
+            ? 'bg-white/90 border-gray-200'
+            : 'bg-white/90 border-gray-300'
         }`}>
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full animate-pulse ${isLiveData ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-            <span className={`font-bold text-xs uppercase tracking-wide ${isLiveData ? 'text-green-700' : 'text-yellow-700'}`}>
-              {isLiveData ? '🟢 LIVE DATA' : '⚠️ LOADING...'}
-            </span>
-          </div>
-          <div className="h-4 w-px bg-gray-300"></div>
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-gray-600" />
-            <span className="font-medium text-gray-700 text-xs">
-              {formatTimestamp(lastUpdated)}
-            </span>
-          </div>
+          <div className={`w-2 h-2 rounded-full ${isLiveData ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
+          <span className={`text-[11px] md:text-xs font-medium ${isLiveData ? 'text-gray-700' : 'text-gray-600'}`}>
+            {isLiveData ? 'Live' : 'Loading...'}
+          </span>
+          {isLiveData && (
+            <>
+              <div className="hidden md:block h-3 w-px bg-gray-300"></div>
+              <Clock className="w-3 h-3 text-gray-500" />
+              <span className="text-[11px] md:text-xs text-gray-600">
+                {formatTimestamp(lastUpdated)}
+              </span>
+            </>
+          )}
         </div>
-        {isLiveData && (
-          <div className="text-center mt-1">
-            <span className="text-[10px] text-gray-600 bg-white/90 px-2 py-0.5 rounded-full">
-              Auto-updates every 5 min
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Error Banner */}
@@ -197,11 +203,21 @@ export default function DashboardPage() {
 
         {/* Map */}
         <div className="col-span-6 relative min-h-0">
-          <Map
-            beaches={beaches}
-            selectedBeach={selectedBeach}
-            onSelectBeach={handleSelectBeach}
-          />
+          <ErrorBoundary
+            fallback={
+              <div className="h-full flex items-center justify-center bg-gray-100 p-6 text-center">
+                <p className="text-sm text-gray-700">
+                  Map failed to load. Refresh the page to retry.
+                </p>
+              </div>
+            }
+          >
+            <Map
+              beaches={beaches}
+              selectedBeach={selectedBeach}
+              onSelectBeach={handleSelectBeach}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Beach Detail Panel */}
@@ -220,19 +236,46 @@ export default function DashboardPage() {
                 selectedBeach={selectedBeach}
                 onSelectBeach={(beach) => {
                   handleSelectBeach(beach);
-                  setShowMobileView('map');
                 }}
               />
             </div>
+            {selectedBeach && (
+              <div className="border-t border-gray-200 bg-white p-3">
+                <button
+                  onClick={() => setShowMobileView('map')}
+                  className="w-full rounded-lg bg-primary text-white py-3 text-sm font-semibold"
+                >
+                  View {selectedBeach.name} on map
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="h-full flex flex-col">
             <div className="flex-1 relative">
-              <Map
-                beaches={beaches}
-                selectedBeach={selectedBeach}
-                onSelectBeach={handleSelectBeach}
-              />
+              <ErrorBoundary
+                fallback={
+                  <div className="h-full flex items-center justify-center bg-gray-100 p-6 text-center">
+                    <div>
+                      <p className="text-sm text-gray-700 mb-3">
+                        Map failed to load on this device.
+                      </p>
+                      <button
+                        onClick={() => setShowMobileView('list')}
+                        className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold"
+                      >
+                        Back to beach list
+                      </button>
+                    </div>
+                  </div>
+                }
+              >
+                <Map
+                  beaches={beaches}
+                  selectedBeach={selectedBeach}
+                  onSelectBeach={handleSelectBeach}
+                />
+              </ErrorBoundary>
             </div>
             {selectedBeach && (
               <div className="h-1/2 overflow-hidden border-t-4 border-primary">

@@ -258,15 +258,17 @@ function SummaryCard({
       <div className="flex items-center justify-between mb-3">
         <div className="p-2 bg-primary/10 rounded-lg text-primary">{icon}</div>
         <span
-          className={`text-sm font-semibold ${
-            changePositive ? 'text-green-600' : 'text-red-600'
+          className={`text-xs font-semibold px-2 py-1 rounded ${
+            changePositive
+              ? 'text-green-700 bg-green-100'
+              : 'text-red-700 bg-red-100'
           }`}
         >
           {change}
         </span>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-1">{value}</h3>
-      <p className="text-sm text-gray-600">{label}</p>
+      <p className="text-sm text-gray-600 mb-1">{label}</p>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
     </div>
   );
 }

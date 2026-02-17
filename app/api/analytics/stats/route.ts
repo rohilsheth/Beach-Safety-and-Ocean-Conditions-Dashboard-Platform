@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { AnalyticsEvent } from '@/lib/analytics';
+import {
+  isAdminAuthenticated,
+  unauthorizedAdminResponse,
+} from '@/lib/server/adminAuth';
 import fs from 'fs';
 import path from 'path';
 
@@ -105,9 +109,14 @@ function calculateStats(events: AnalyticsEvent[], days: number = 7) {
 
 // GET - Retrieve analytics statistics
 export async function GET(request: Request) {
+  if (!isAdminAuthenticated()) {
+    return unauthorizedAdminResponse();
+  }
+
   try {
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') || '7', 10);
+    const rawDays = parseInt(searchParams.get('days') || '7', 10);
+    const days = [7, 30, 90].includes(rawDays) ? rawDays : 7;
 
     const events = readAnalyticsEvents();
     const stats = calculateStats(events, days);
