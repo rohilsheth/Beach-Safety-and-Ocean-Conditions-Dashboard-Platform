@@ -37,6 +37,14 @@ export default function Header() {
   ];
 
   return (
+    <>
+    {/* Skip to main content - WCAG 2.4.1 */}
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-primary focus:rounded focus:font-medium focus:shadow-lg"
+    >
+      Skip to main content
+    </a>
     <header className="bg-primary text-white shadow-lg flex-shrink-0">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-start justify-between mb-2 gap-3">
@@ -115,5 +123,6 @@ export default function Header() {
         </div>
       </div>
     </header>
+    </>
   );
 }

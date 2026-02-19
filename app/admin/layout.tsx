@@ -30,30 +30,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full bg-gray-50">
       {/* Admin Header */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg flex-shrink-0">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-start justify-between mb-4 gap-3">
-            <div className="flex items-center gap-3">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 sm:mb-4 gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl">
                 🏛️
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">Admin Portal</h1>
-                <p className="text-blue-100 text-sm">San Mateo County Beach Safety</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-2xl font-bold leading-tight">Admin Portal</h1>
+                <p className="text-blue-100 text-sm leading-tight">
+                  San Mateo County Beach Safety
+                </p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:items-center sm:w-auto">
               <Link
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors whitespace-nowrap"
               >
                 <ExternalLink className="w-4 h-4" />
                 Open User View
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors whitespace-nowrap"
               >
                 <LogOut className="w-4 h-4" />
                 Logout
@@ -62,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Admin Navigation */}
-          <nav className="flex gap-2 border-t border-white/20 pt-3 overflow-x-auto">
+          <nav className="flex gap-2 border-t border-white/20 pt-3 overflow-x-auto pb-1">
             {navItems.map((item) => {
               const isActive = item.exact
                 ? pathname === item.href
@@ -72,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${
                     isActive
                       ? 'bg-white text-blue-700'
                       : 'text-white/90 hover:bg-white/10'

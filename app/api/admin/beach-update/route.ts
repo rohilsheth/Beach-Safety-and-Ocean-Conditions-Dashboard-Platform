@@ -5,43 +5,10 @@ import {
   unauthorizedAdminResponse,
 } from '@/lib/server/adminAuth';
 import { invalidateBeachDataCache } from '@/lib/api/aggregator';
-import fs from 'fs';
-import path from 'path';
-
-const ADMIN_UPDATES_FILE = path.join(process.cwd(), 'data', 'admin-updates.json');
-
-// Ensure data directory exists
-function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
-
-// Read admin updates from file
-function readAdminUpdates(): AdminUpdate[] {
-  try {
-    ensureDataDir();
-    if (fs.existsSync(ADMIN_UPDATES_FILE)) {
-      const data = fs.readFileSync(ADMIN_UPDATES_FILE, 'utf-8');
-      return JSON.parse(data);
-    }
-    return [];
-  } catch (error) {
-    console.error('Error reading admin updates:', error);
-    return [];
-  }
-}
-
-// Write admin updates to file
-function writeAdminUpdates(updates: AdminUpdate[]) {
-  try {
-    ensureDataDir();
-    fs.writeFileSync(ADMIN_UPDATES_FILE, JSON.stringify(updates, null, 2));
-  } catch (error) {
-    console.error('Error writing admin updates:', error);
-  }
-}
+import {
+  readAdminUpdates,
+  writeAdminUpdates,
+} from '@/lib/server/persistence';
 
 // GET - Retrieve all admin updates
 export async function GET() {
@@ -50,7 +17,7 @@ export async function GET() {
   }
 
   try {
-    const updates = readAdminUpdates();
+    const updates = await readAdminUpdates<AdminUpdate>();
     return NextResponse.json({
       success: true,
       data: updates,
@@ -73,7 +40,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const updates = readAdminUpdates();
+    const updates = await readAdminUpdates<AdminUpdate>();
 
     const newUpdate: AdminUpdate = {
       beachId: body.beachId,
@@ -94,7 +61,7 @@ export async function POST(request: Request) {
       updates.splice(100);
     }
 
-    writeAdminUpdates(updates);
+    await writeAdminUpdates<AdminUpdate>(updates);
     invalidateBeachDataCache();
 
     return NextResponse.json({
@@ -128,12 +95,12 @@ export async function DELETE(request: Request) {
       );
     }
 
-    const updates = readAdminUpdates();
+    const updates = await readAdminUpdates<AdminUpdate>();
 
     // Remove all updates for this specific beach
     const filteredUpdates = updates.filter((update) => update.beachId !== beachId);
 
-    writeAdminUpdates(filteredUpdates);
+    await writeAdminUpdates<AdminUpdate>(filteredUpdates);
     invalidateBeachDataCache();
 
     return NextResponse.json({

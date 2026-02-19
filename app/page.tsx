@@ -276,7 +276,7 @@ export default function DashboardPage() {
         )}
 
         {selectedBeach && (
-          <div className="absolute inset-0 z-50 bg-white overflow-hidden">
+          <div className="absolute inset-0 z-[1200] bg-white overflow-hidden">
             <BeachDetail
               beach={selectedBeach}
               onClose={() => handleSelectBeach(null)}

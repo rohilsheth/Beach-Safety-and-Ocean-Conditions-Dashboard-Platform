@@ -70,7 +70,7 @@ export default function BeachList({
         >
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
           <input
             type="text"
             placeholder={t('ui.search')}
@@ -156,12 +156,13 @@ function BeachListItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full p-4 text-left transition-colors hover:bg-gray-50 ${
+      className={`w-full p-4 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset ${
         isSelected ? 'bg-blue-50 border-l-4 border-primary' : ''
       }`}
       aria-pressed={isSelected}
+      aria-label={`${beach.name}${beach.nickname ? ` (${beach.nickname})` : ''}, ${t(`region.${beach.region}`)}, ${t(`flag.${beach.flagStatus}`)}, waves ${beach.conditions.waveHeight} feet, wind ${beach.conditions.windSpeed} mph`}
     >
-      <div className="space-y-2">
+      <div className="space-y-2" aria-hidden="true">
         {/* Beach Name and Region */}
         <div>
           <h3 className="font-semibold text-sm text-gray-900">
@@ -173,7 +174,7 @@ function BeachListItem({
             )}
           </h3>
           <div className="flex items-center gap-1 text-xs text-gray-600 mt-0.5">
-            <MapPin className="w-3 h-3" />
+            <MapPin className="w-3 h-3" aria-hidden="true" />
             <span>{t(`region.${beach.region}`)}</span>
           </div>
         </div>

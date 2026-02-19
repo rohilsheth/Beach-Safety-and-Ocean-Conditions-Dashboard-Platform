@@ -1,3 +1,5 @@
+> NOTE: Original project prompt artifact. It is preserved for reference and does not represent current route/auth/documentation state.
+
 ## Context
 
 I'm responding to a government RFP (San Mateo County, California — RFP-Informal No. 2026-RFP-Informal-00253) for a **Beach Safety and Ocean Conditions Dashboard Platform**. I need to build a working product demo that meets the RFP's requirements. This is for a job application take-home project, so it needs to demonstrate systems thinking and be functional — not just look pretty.

@@ -16,6 +16,7 @@ export default function AdminAlertsPage() {
   const [alertLanguage, setAlertLanguage] = useState<'en' | 'es' | 'both'>('both');
   const [alertStatus, setAlertStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [activeAlerts, setActiveAlerts] = useState<CustomAlert[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string>('');
 
   useEffect(() => {
     fetchActiveAlerts();
@@ -26,15 +27,20 @@ export default function AdminAlertsPage() {
       const response = await fetch('/api/custom-alerts');
       const result = await response.json();
       if (result.success) {
+        setStatusMessage('');
         setActiveAlerts(result.data);
+      } else {
+        setStatusMessage(result.error || 'Failed to fetch active alerts');
       }
     } catch (error) {
       console.error('Error fetching alerts:', error);
+      setStatusMessage('Failed to fetch active alerts');
     }
   };
 
   const handlePostAlert = async () => {
     if (!alertTitle || !alertMessage) {
+      setStatusMessage('Title and message are required.');
       setAlertStatus('error');
       setTimeout(() => setAlertStatus('idle'), 2000);
       return;
@@ -62,6 +68,7 @@ export default function AdminAlertsPage() {
       const result = await response.json();
 
       if (result.success) {
+        setStatusMessage('');
         setAlertStatus('success');
         // Reset form
         setAlertTitle('');
@@ -76,10 +83,11 @@ export default function AdminAlertsPage() {
           setAlertStatus('idle');
         }, 2000);
       } else {
-        throw new Error('Failed to post alert');
+        throw new Error(result.error || 'Failed to post alert');
       }
     } catch (error) {
       console.error('Error posting alert:', error);
+      setStatusMessage(error instanceof Error ? error.message : 'Failed to post alert');
       setAlertStatus('error');
 
       setTimeout(() => {
@@ -101,11 +109,15 @@ export default function AdminAlertsPage() {
       const result = await response.json();
 
       if (result.success) {
+        setStatusMessage('');
         // Refresh alerts list
         fetchActiveAlerts();
+      } else {
+        throw new Error(result.error || 'Failed to deactivate alert');
       }
     } catch (error) {
       console.error('Error deleting alert:', error);
+      setStatusMessage(error instanceof Error ? error.message : 'Failed to deactivate alert');
     }
   };
 
@@ -136,6 +148,12 @@ export default function AdminAlertsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alert Form */}
         <div className="lg:col-span-2 space-y-6">
+          {statusMessage && (
+            <div className="bg-red-50 border border-red-300 text-red-700 rounded-lg p-3 text-sm">
+              {statusMessage}
+            </div>
+          )}
+
           {/* Beach Selection */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">

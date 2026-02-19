@@ -204,7 +204,7 @@ function ConditionCard({
   return (
     <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
       <div className="flex items-center gap-2 mb-1 text-gray-600">
-        {icon}
+        <span aria-hidden="true">{icon}</span>
         <span className="text-xs font-medium">{label}</span>
       </div>
       <p className="text-lg font-bold text-gray-900">{value}</p>

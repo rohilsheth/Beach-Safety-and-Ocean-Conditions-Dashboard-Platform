@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [resetStatus, setResetStatus] = useState<'idle' | 'resetting' | 'success' | 'error'>(
     'idle'
   );
+  const [statusMessage, setStatusMessage] = useState<string>('');
 
   const selectedBeach = beaches.find((b) => b.id === selectedBeachId);
 
@@ -69,16 +70,18 @@ export default function AdminPage() {
       if (result.success) {
         const update: AdminUpdate = result.data;
         setUpdateLog((prev) => [update, ...prev].slice(0, 10));
+        setStatusMessage('');
         setSaveStatus('success');
 
         setTimeout(() => {
           setSaveStatus('idle');
         }, 2000);
       } else {
-        throw new Error('Failed to save');
+        throw new Error(result.error || 'Failed to save');
       }
     } catch (error) {
       console.error('Error saving beach update:', error);
+      setStatusMessage(error instanceof Error ? error.message : 'Failed to save update');
       setSaveStatus('error');
 
       setTimeout(() => {
@@ -106,6 +109,7 @@ export default function AdminPage() {
       const result = await response.json();
 
       if (result.success) {
+        setStatusMessage('');
         setResetStatus('success');
 
         // Reload the beach data to show automatic values
@@ -120,10 +124,11 @@ export default function AdminPage() {
           setResetStatus('idle');
         }, 2000);
       } else {
-        throw new Error('Failed to reset');
+        throw new Error(result.error || 'Failed to reset');
       }
     } catch (error) {
       console.error('Error resetting beach:', error);
+      setStatusMessage(error instanceof Error ? error.message : 'Failed to reset override');
       setResetStatus('error');
 
       setTimeout(() => {
@@ -144,12 +149,12 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+    <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           {t('admin.title')}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Update beach safety conditions and post custom advisories
         </p>
       </div>
@@ -158,7 +163,7 @@ export default function AdminPage() {
         {/* Admin Form */}
         <div className="lg:col-span-2 space-y-6">
           {/* Beach Selection */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               {t('admin.selectBeach')}
             </h2>
@@ -178,12 +183,18 @@ export default function AdminPage() {
 
           {selectedBeach && (
             <>
+              {statusMessage && (
+                <div className="bg-red-50 border border-red-300 text-red-700 rounded-lg p-3 text-sm">
+                  {statusMessage}
+                </div>
+              )}
+
               {/* Current Status Preview */}
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 sm:p-6">
                 <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
                   Current Status
                 </h3>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   <FlagBadge status={selectedBeach.flagStatus} size="lg" />
                   <div>
                     <p className="text-sm text-gray-600">
@@ -199,16 +210,16 @@ export default function AdminPage() {
               </div>
 
               {/* Flag Status */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('admin.setFlag')}
                 </h2>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {(['green', 'yellow', 'red'] as FlagStatus[]).map((status) => (
                     <button
                       key={status}
                       onClick={() => setFlagStatus(status)}
-                      className={`p-4 rounded-lg border-2 transition-all ${
+                      className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${
                         flagStatus === status
                           ? 'border-primary bg-blue-50 ring-2 ring-primary'
                           : 'border-gray-300 hover:border-gray-400'
@@ -224,11 +235,11 @@ export default function AdminPage() {
               </div>
 
               {/* Hazards */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('admin.hazards')}
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {allHazards.map((hazard) => {
                     const config = HAZARD_CONFIG[hazard];
                     const isSelected = selectedHazards.includes(hazard);
@@ -255,7 +266,7 @@ export default function AdminPage() {
               </div>
 
               {/* Advisory Message */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('admin.advisory')}
                 </h2>
@@ -272,12 +283,12 @@ export default function AdminPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Save Button */}
                 <button
                   onClick={handleSave}
                   disabled={saveStatus === 'saving'}
-                  className={`py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-3 transition-all ${
+                  className={`py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg flex items-center justify-center gap-3 transition-all ${
                     saveStatus === 'success'
                       ? 'bg-green-600 text-white'
                       : saveStatus === 'error'
@@ -315,7 +326,7 @@ export default function AdminPage() {
                 <button
                   onClick={handleReset}
                   disabled={resetStatus === 'resetting'}
-                  className={`py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-3 transition-all ${
+                  className={`py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg flex items-center justify-center gap-3 transition-all ${
                     resetStatus === 'success'
                       ? 'bg-green-600 text-white'
                       : resetStatus === 'error'
@@ -355,7 +366,7 @@ export default function AdminPage() {
 
         {/* Update Log Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-4">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               {t('admin.updateLog')}
             </h2>

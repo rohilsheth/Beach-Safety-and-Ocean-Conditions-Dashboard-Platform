@@ -29,30 +29,27 @@ import {
 } from './nws';
 import { fetchOpenMeteoData, fetchMarineData } from './openmeteo';
 import { getTideData } from './tides';
-import fs from 'fs';
-import path from 'path';
+import { readAdminUpdates } from '@/lib/server/persistence';
 
 /**
  * Fetch admin overrides from file
  */
-function getAdminOverrides(): AdminUpdate[] {
+async function getAdminOverrides(): Promise<AdminUpdate[]> {
   try {
-    const filePath = path.join(process.cwd(), 'data', 'admin-updates.json');
-    if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf-8');
-      return JSON.parse(data);
-    }
+    return await readAdminUpdates<AdminUpdate>();
   } catch (error) {
     console.error('Error reading admin overrides:', error);
+    return [];
   }
-  return [];
 }
 
 /**
  * Get the most recent admin override for a specific beach
  */
-function getLatestAdminOverride(beachId: string): AdminUpdate | null {
-  const updates = getAdminOverrides();
+function getLatestAdminOverride(
+  updates: AdminUpdate[],
+  beachId: string
+): AdminUpdate | null {
   return updates.find((u) => u.beachId === beachId) || null;
 }
 
@@ -76,6 +73,8 @@ function applyAdminOverride(beach: Beach, override: AdminUpdate | null): Beach {
  */
 export async function aggregateBeachData(): Promise<Beach[]> {
   try {
+    const adminOverrides = await getAdminOverrides();
+
     // Fetch NWS alerts (applies to all beaches)
     const nwsAlerts = await fetchNWSAlerts();
 
@@ -150,11 +149,17 @@ export async function aggregateBeachData(): Promise<Beach[]> {
 
         // Add hazards from NWS alerts
         beachAlerts.forEach((alert) => {
-          if (alert.event.toLowerCase().includes('rip current')) {
+          const event = alert.event.toLowerCase();
+          const desc = (alert.description || '').toLowerCase();
+          if (event.includes('rip current')) {
             hazards.add('rip-currents');
           }
-          if (alert.event.toLowerCase().includes('high surf')) {
+          if (event.includes('high surf')) {
             hazards.add('high-surf');
+          }
+          // Sneaker waves: only add if description explicitly mentions sneaker waves
+          if (desc.includes('sneaker wave')) {
+            hazards.add('sneaker-waves');
           }
         });
 
@@ -184,7 +189,7 @@ export async function aggregateBeachData(): Promise<Beach[]> {
         };
 
         // Apply admin overrides (takes priority over all other data)
-        const adminOverride = getLatestAdminOverride(beach.id);
+        const adminOverride = getLatestAdminOverride(adminOverrides, beach.id);
         return applyAdminOverride(updatedBeach, adminOverride);
       })
     );

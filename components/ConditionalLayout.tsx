@@ -19,7 +19,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   return (
     <>
       <Header />
-      <main className="flex-1 flex flex-col overflow-auto">{children}</main>
+      <main id="main-content" className="flex-1 flex flex-col overflow-auto">{children}</main>
       <div className={isDashboard ? 'hidden md:block' : ''}>
         <Footer />
       </div>

@@ -23,13 +23,13 @@ export default function HazardChip({ hazard, size = 'md' }: HazardChipProps) {
   return (
     <div
       className={`inline-flex items-center gap-1.5 bg-white border-2 border-gray-300 rounded-lg ${sizeClasses[size]} font-medium ${config.color}`}
-      role="alert"
+      role="img"
       aria-label={`Hazard: ${label}`}
     >
-      <span className="text-base" role="img" aria-hidden="true">
+      <span className="text-base" aria-hidden="true">
         {config.icon}
       </span>
-      <span>{label}</span>
+      <span aria-hidden="true">{label}</span>
     </div>
   );
 }

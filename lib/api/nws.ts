@@ -108,6 +108,7 @@ export function isBeachSafetyAlert(alert: NWSAlert): boolean {
     'Beach Hazards Statement',
     'Coastal Flood Advisory',
     'Coastal Flood Warning',
+    'Coastal Hazard Message', // NWS uses this for sneaker waves on Pacific coast
     'Small Craft Advisory',
     'Gale Warning',
     'Storm Warning',

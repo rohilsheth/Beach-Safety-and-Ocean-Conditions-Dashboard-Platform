@@ -4,48 +4,15 @@ import {
   isAdminAuthenticated,
   unauthorizedAdminResponse,
 } from '@/lib/server/adminAuth';
-import fs from 'fs';
-import path from 'path';
-
-const ALERTS_FILE = path.join(process.cwd(), 'data', 'custom-alerts.json');
-
-// Ensure data directory exists
-function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
-
-// Read alerts from file
-function readAlerts(): CustomAlert[] {
-  try {
-    ensureDataDir();
-    if (fs.existsSync(ALERTS_FILE)) {
-      const data = fs.readFileSync(ALERTS_FILE, 'utf-8');
-      return JSON.parse(data);
-    }
-    return [];
-  } catch (error) {
-    console.error('Error reading alerts:', error);
-    return [];
-  }
-}
-
-// Write alerts to file
-function writeAlerts(alerts: CustomAlert[]) {
-  try {
-    ensureDataDir();
-    fs.writeFileSync(ALERTS_FILE, JSON.stringify(alerts, null, 2));
-  } catch (error) {
-    console.error('Error writing alerts:', error);
-  }
-}
+import {
+  readCustomAlerts,
+  writeCustomAlerts,
+} from '@/lib/server/persistence';
 
 // GET - Retrieve all active custom alerts
 export async function GET() {
   try {
-    const alerts = readAlerts();
+    const alerts = await readCustomAlerts<CustomAlert>();
     const now = new Date().toISOString();
 
     // Filter active and non-expired alerts
@@ -75,7 +42,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const alerts = readAlerts();
+    const alerts = await readCustomAlerts<CustomAlert>();
 
     const newAlert: CustomAlert = {
       id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -91,7 +58,7 @@ export async function POST(request: Request) {
     };
 
     alerts.push(newAlert);
-    writeAlerts(alerts);
+    await writeCustomAlerts<CustomAlert>(alerts);
 
     return NextResponse.json({
       success: true,
@@ -124,12 +91,12 @@ export async function DELETE(request: Request) {
       );
     }
 
-    const alerts = readAlerts();
+    const alerts = await readCustomAlerts<CustomAlert>();
     const updatedAlerts = alerts.map((alert) =>
       alert.id === alertId ? { ...alert, isActive: false } : alert
     );
 
-    writeAlerts(updatedAlerts);
+    await writeCustomAlerts<CustomAlert>(updatedAlerts);
 
     return NextResponse.json({
       success: true,

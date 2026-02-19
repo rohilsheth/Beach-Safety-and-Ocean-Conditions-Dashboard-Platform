@@ -15,12 +15,20 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
 
+  // WCAG 3.1.1 - update <html lang> when language changes
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+    }
+  };
+
   const t = (key: string): string => {
     return translations[key]?.[language] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

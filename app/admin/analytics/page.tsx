@@ -62,6 +62,14 @@ export default function AnalyticsPage() {
     { hour: '8 PM', visits: 320 },
   ];
 
+  const alertClickThroughRates = [
+    { alert: 'Rip Current Advisory', ctr: 18.4 },
+    { alert: 'High Surf Warning', ctr: 24.1 },
+    { alert: 'Water Quality Notice', ctr: 11.7 },
+    { alert: 'Wildlife Safety Alert', ctr: 15.3 },
+    { alert: 'Beach Closure Notice', ctr: 29.6 },
+  ];
+
   const totalVisits = monthlyVisits.reduce((sum, day) => sum + day.visits, 0);
   const avgDailyVisits = Math.round(totalVisits / monthlyVisits.length);
 
@@ -74,6 +82,10 @@ export default function AnalyticsPage() {
         <p className="text-gray-600">
           User engagement metrics for February 2026
         </p>
+      </div>
+
+      <div className="mb-6 bg-amber-50 border border-amber-300 text-amber-800 rounded-lg px-4 py-3 text-sm">
+        Demo Note: These analytics are mock sample data for demonstration purposes.
       </div>
 
       {/* Summary Cards */}
@@ -196,6 +208,22 @@ export default function AnalyticsPage() {
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      {/* Alert Click-Through Rate Chart */}
+      <div className="mt-6 bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Alert Click-Through Rate
+        </h2>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={alertClickThroughRates}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="alert" tick={{ fontSize: 11 }} />
+            <YAxis tick={{ fontSize: 12 }} unit="%" />
+            <Tooltip formatter={(value: number) => `${value}%`} />
+            <Bar dataKey="ctr" fill="#ef4444" name="CTR %" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Insights Section */}
