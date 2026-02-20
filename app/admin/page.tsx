@@ -149,13 +149,13 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+    <div className="container mx-auto px-4 py-4 sm:py-6 max-w-6xl">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1">
           {t('admin.title')}
         </h1>
-        <p className="text-sm sm:text-base text-gray-600">
-          Update beach safety conditions and post custom advisories
+        <p className="text-sm text-gray-600">
+          {t('admin.subtitle')}
         </p>
       </div>
 
@@ -172,7 +172,7 @@ export default function AdminPage() {
               onChange={(e) => handleBeachSelect(e.target.value)}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none text-base"
             >
-              <option value="">-- Select a beach --</option>
+              <option value="">{t('admin.selectBeachPlaceholder')}</option>
               {beaches.map((beach) => (
                 <option key={beach.id} value={beach.id}>
                   {beach.name} ({beach.region})
@@ -192,17 +192,17 @@ export default function AdminPage() {
               {/* Current Status Preview */}
               <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 sm:p-6">
                 <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                  Current Status
+                  {t('admin.currentStatus')}
                 </h3>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   <FlagBadge status={selectedBeach.flagStatus} size="lg" />
                   <div>
                     <p className="text-sm text-gray-600">
-                      {selectedBeach.hazards.length} active hazard(s)
+                      {selectedBeach.hazards.length} {t('admin.activeHazards')}
                     </p>
                     {selectedBeach.advisory && (
                       <p className="text-xs text-gray-500 mt-1">
-                        Advisory posted
+                        {t('admin.advisoryPosted')}
                       </p>
                     )}
                   </div>
@@ -273,12 +273,12 @@ export default function AdminPage() {
                 <textarea
                   value={advisory}
                   onChange={(e) => setAdvisory(e.target.value)}
-                  placeholder="Enter a custom advisory message (optional)..."
+                  placeholder={t('admin.advisoryPlaceholder')}
                   rows={4}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none resize-none"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  This message will be displayed prominently on the beach detail page.
+                  {t('admin.advisoryHint')}
                 </p>
               </div>
 
@@ -299,7 +299,7 @@ export default function AdminPage() {
                   {saveStatus === 'saving' && (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Saving...</span>
+                      <span>{t('admin.saving')}</span>
                     </>
                   )}
                   {saveStatus === 'success' && (
@@ -311,7 +311,7 @@ export default function AdminPage() {
                   {saveStatus === 'error' && (
                     <>
                       <AlertCircle className="w-5 h-5" />
-                      <span>Error</span>
+                      <span>{t('admin.error')}</span>
                     </>
                   )}
                   {saveStatus === 'idle' && (
@@ -337,25 +337,25 @@ export default function AdminPage() {
                   {resetStatus === 'resetting' && (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Resetting...</span>
+                      <span>{t('admin.resetting')}</span>
                     </>
                   )}
                   {resetStatus === 'success' && (
                     <>
                       <CheckCircle className="w-5 h-5" />
-                      <span>Reset Complete</span>
+                      <span>{t('admin.resetComplete')}</span>
                     </>
                   )}
                   {resetStatus === 'error' && (
                     <>
                       <AlertCircle className="w-5 h-5" />
-                      <span>Error</span>
+                      <span>{t('admin.error')}</span>
                     </>
                   )}
                   {resetStatus === 'idle' && (
                     <>
                       <RotateCcw className="w-5 h-5" />
-                      <span>Reset to Automatic</span>
+                      <span>{t('admin.resetAutomatic')}</span>
                     </>
                   )}
                 </button>
@@ -372,7 +372,7 @@ export default function AdminPage() {
             </h2>
             {updateLog.length === 0 ? (
               <p className="text-sm text-gray-500 text-center py-8">
-                No recent updates
+                {t('admin.noUpdates')}
               </p>
             ) : (
               <div className="space-y-4">

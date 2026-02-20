@@ -4,10 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ExternalLink, LogOut } from 'lucide-react';
+import LanguageToggle from '@/components/LanguageToggle';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
 
   // Don't show layout on login page
   if (pathname === '/admin/login') {
@@ -21,9 +24,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const navItems = [
-    { href: '/admin', label: 'Beach Conditions', exact: true },
-    { href: '/admin/alerts', label: 'Alerts' },
-    { href: '/admin/analytics', label: 'Analytics' },
+    { href: '/admin', label: t('admin.nav.conditions'), exact: true },
+    { href: '/admin/alerts', label: t('admin.nav.alerts') },
+    { href: '/admin/analytics', label: t('admin.nav.analytics') },
   ];
 
   return (
@@ -37,28 +40,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 🏛️
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-2xl font-bold leading-tight">Admin Portal</h1>
-                <p className="text-blue-100 text-sm leading-tight">
-                  San Mateo County Beach Safety
+                <h1 className="text-xl sm:text-2xl font-bold leading-tight">{t('admin.portalTitle')}</h1>
+                <p className="text-blue-100 text-xs sm:text-sm leading-tight">
+                  {t('admin.portalSubtitle')}
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:items-center sm:w-auto">
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
               <Link
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors"
+                aria-label={t('admin.openUserView')}
               >
-                <ExternalLink className="w-4 h-4" />
-                Open User View
+                <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('admin.openUserView')}</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium text-sm transition-colors"
+                aria-label={t('admin.logout')}
               >
-                <LogOut className="w-4 h-4" />
-                Logout
+                <LogOut className="w-4 h-4" aria-hidden="true" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('admin.logout')}</span>
               </button>
             </div>
           </div>

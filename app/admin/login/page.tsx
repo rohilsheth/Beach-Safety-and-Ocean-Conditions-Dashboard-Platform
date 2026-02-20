@@ -24,8 +24,7 @@ export default function AdminLogin() {
       });
 
       if (response.ok) {
-        router.push('/admin');
-        router.refresh();
+        window.location.href = '/admin';
       } else {
         const result = await response.json().catch(() => null);
         setError(result?.error || 'Invalid username or password. Please try again.');
@@ -100,7 +99,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
